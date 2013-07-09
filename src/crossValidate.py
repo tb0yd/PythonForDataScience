@@ -1,11 +1,17 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import cross_validation
 import logloss
+import sys
 import numpy as np
+from optparse import OptionParser
 
 def main():
+    # pull in data from input stream
+    infile = sys.stdin
+
     #read in  data, parse into training and target sets
-    dataset = np.genfromtxt(open('Data/train.csv','r'), delimiter=',', dtype='f8')[1:]    
+    # dataset = np.genfromtxt(open('Data/train.csv','r'), delimiter=',', dtype='f8')[1:]
+    dataset = np.genfromtxt(infile, delimiter=',', dtype='f8')[1:]
     target = np.array([x[0] for x in dataset])
     train = np.array([x[1:] for x in dataset])
 

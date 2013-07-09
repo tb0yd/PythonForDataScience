@@ -1,9 +1,8 @@
 #!/bin/bash
 
-SRC=../src
-DATA=../data
+SRC=./src
+DATA=./Data
 
 cat $DATA/train.csv \
-	| python $SRC/subsample.py -r 0.1 \
-	| python $SRC/cleandata.py \
-	> $DATA/outputfile.csv
+	| python $SRC/prepare.py \
+	| python $SRC/crossValidate.py
