@@ -49,20 +49,25 @@ def main():
 
 def format_csv(infile, outfile, test_data):
 	if test_data:
-		inlabels = ["Sex", "Age", "Pclass", "Fare", "Cabin", "SibSp", "Parch", "Embarked"]
-		outlabels = "PassengerId,IsFemale,Age,Pclass,Fare,Cabin,SibSp,Parch,Embarked\n"
+		inlabels = ["Sex", "Pclass", "SibSp", "Parch", "Fare", "Age"]
+		outlabels = "IsFemale,Pclass,SibSp,Parch,Fare,Age,DiscountFactor"
 	else:
-		inlabels = ["Survived", "Sex", "Age", "Pclass", "Fare", "Cabin", "SibSp", "Parch", "Embarked"]
-		outlabels = "Survived,IsFemale,Age,Pclass,Fare,Cabin,SibSp,Parch,Embarked\n"
+		inlabels = ["Survived", "Sex", "Pclass", "SibSp", "Parch", "Fare", "Age"]
+		outlabels = "Survived,IsFemale,Pclass,SibSp,Parch,Fare,Age,DiscountFactor"
 
 	df = pd.read_csv(infile, index_col="PassengerId")[inlabels]
-	df["Sex"] = df["Sex"].map(lambda x: 1 if x == "female" else 0)
-	df["Cabin"] = df[~pd.isnull(df["Cabin"])]["Cabin"].map(lambda x: list('ABCDEFGT').index(list(x)[0]))
-	df["Embarked"] = df[~pd.isnull(df["Embarked"])]["Embarked"].map(lambda x: list('CQS').index(list(x)[0]))
-	outfile.write(outlabels)
+	df["IsFemale"] = df["Sex"].map(lambda x: 1 if x == "female" else 0)
+	df["DiscountFactor"] = df[["Fare", "Pclass"]].apply(lambda x: 1 / (x[0] * x[1]), axis=1)
+	#df["Age"] = df["Age"].fillna(df.median()["Age"])
+	#df["Cabin"] = df[~pd.isnull(df["Cabin"])]["Cabin"].map(lambda x: list('ABCDEFGT').index(list(x)[0]))
+	#df["Embarked"] = df[~pd.isnull(df["Embarked"])]["Embarked"].map(lambda x: list('CQS').index(list(x)[0]))
+	if test_data:
+		outfile.write("PassengerID," + outlabels + "\n")
+	else:
+		outfile.write(outlabels + "\n")
 
 	# only show the index (PassengerId) if it's test data b/c we need to identify that
-	df.to_csv(outfile, header=False, index=test_data)
+	df[outlabels.split(",")].to_csv(outfile, header=False, index=test_data)
 
 if __name__=='__main__':
 	main()
